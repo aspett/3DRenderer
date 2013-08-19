@@ -4,11 +4,11 @@ import java.awt.Color;
 
 
 public class Polygon {
-	private Vertex v1,v2,v3;
+	private Vector3D v1,v2,v3;
 	private int r,g,b;
 	//private Color color;
 
-	public Polygon(Vertex v1, Vertex v2, Vertex v3, Color c) {
+	public Polygon(Vector3D v1, Vector3D v2, Vector3D v3, Color c) {
 		this.v1 = v1;
 		this.v2 = v2;
 		this.v3 = v3;
@@ -23,15 +23,15 @@ public class Polygon {
 		// v1 v2 v3 v1 v2 v3 v1 v2 v3 r g  b
 		String[] split = line.split(" ");
 		try {
-			this.v1 = new Vertex(	Float.parseFloat(split[0]),
+			this.v1 = new Vector3D(	Float.parseFloat(split[0]),
 									Float.parseFloat(split[1]),
 									Float.parseFloat(split[2]));
 
-			this.v2 = new Vertex(	Float.parseFloat(split[3]),
+			this.v2 = new Vector3D(	Float.parseFloat(split[3]),
 									Float.parseFloat(split[4]),
 									Float.parseFloat(split[5]));
 
-			this.v3 = new Vertex(	Float.parseFloat(split[6]),
+			this.v3 = new Vector3D(	Float.parseFloat(split[6]),
 									Float.parseFloat(split[7]),
 									Float.parseFloat(split[8]));
 
@@ -48,15 +48,15 @@ public class Polygon {
 		return new Color(r,g,b);
 	}
 
-	public Vertex getV1() {
+	public Vector3D getV1() {
 		return v1;
 	}
 
-	public Vertex getV2() {
+	public Vector3D getV2() {
 		return v2;
 	}
 
-	public Vertex getV3() {
+	public Vector3D getV3() {
 		return v3;
 	}
 

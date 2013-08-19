@@ -1,3 +1,4 @@
+package main;
 /* Code for COMP261 Assignment
  * Author: pondy
  */
