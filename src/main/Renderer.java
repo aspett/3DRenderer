@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -12,12 +13,12 @@ import javax.swing.JPanel;
 
 
 public class Renderer {
-	public List<Polygon> polygon;
+	public List<Polygon> polygons;
 	public Vector3D lightSource;
-	static String filename = "res/ball.txt";
+	static String filename = "res/tetras.txt";
 	RenderFrame frame;
 	public Renderer() {
-		polygon = new ArrayList<Polygon>();
+		polygons = new ArrayList<Polygon>();
 		if(filename != null) loadPolygon(filename);
 		
 		frame = new RenderFrame();
@@ -35,7 +36,7 @@ public class Renderer {
 		
 		System.out.println("Light source: " + r.lightSource.toString());
 		
-		for(Polygon p : r.polygon) {
+		for(Polygon p : r.polygons) {
 			System.out.println(p);
 		}
 	}
@@ -48,7 +49,7 @@ public class Renderer {
 			lightSource = new Vector3D(scan.nextLine());
 			
 			while(scan.hasNextLine()) {
-				polygon.add(new Polygon(scan.nextLine()));
+				polygons.add(new Polygon(scan.nextLine()));
 			}
 			scan.close();
 		} 
@@ -57,9 +58,17 @@ public class Renderer {
 		}
 	}
 	
-	protected void renderCanvas(Graphics g, JPanel panel) {
+	protected void renderCanvas(Graphics gr, JPanel panel) {
+		Graphics2D g = (Graphics2D) gr;
 		g.setColor(Color.black);
 		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
+		g.setColor(Color.red);
+		for(Polygon p : polygons) {
+			Vector3D v1 = p.getV1(), v2 = p.getV2(), v3 = p.getV3();
+			g.drawLine((int)v1.x, (int)v1.y, (int)v2.x, (int)v2.y);
+			g.drawLine((int)v2.x, (int)v2.y, (int)v3.x, (int)v3.y);
+			g.drawLine((int)v3.x, (int)v3.y, (int)v1.x, (int)v1.y);
+		}
 		
 	}
 }

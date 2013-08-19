@@ -3,6 +3,8 @@ package main;
 import java.awt.Color;
 
 
+
+@SuppressWarnings("serial")
 public class Polygon {
 	private Vector3D v1,v2,v3;
 	private int r,g,b;
@@ -16,6 +18,7 @@ public class Polygon {
 		this.r = c.getRed();
 		this.g = c.getGreen();
 		this.b = c.getBlue();
+
 	}
 
 	public Polygon(String line) {
