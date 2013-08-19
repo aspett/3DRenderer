@@ -1,34 +1,38 @@
 package main;
 
 public class Vertex {
-	private double x;
-	private double y;
-	private double z;
+	private float x;
+	private float y;
+	private float z;
 
 
-	public Vertex(double x, double y, double z) {
+	public Vertex(float x, float y, float z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public double getX() {
+	public float getX() {
 		return x;
 	}
-	public void setX(double x) {
+	public void setX(float x) {
 		this.x = x;
 	}
-	public double getY() {
+	public float getY() {
 		return y;
 	}
-	public void setY(double y) {
+	public void setY(float y) {
 		this.y = y;
 	}
-	public double getZ() {
+	public float getZ() {
 		return z;
 	}
-	public void setZ(double z) {
+	public void setZ(float z) {
 		this.z = z;
+	}
+
+	public String toString() {
+		return String.format("%f, %f, %f", x,y,z);
 	}
 
 

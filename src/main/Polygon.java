@@ -5,13 +5,17 @@ import java.awt.Color;
 
 public class Polygon {
 	private Vertex v1,v2,v3;
-	private Color color;
+	private int r,g,b;
+	//private Color color;
 
 	public Polygon(Vertex v1, Vertex v2, Vertex v3, Color c) {
 		this.v1 = v1;
 		this.v2 = v2;
 		this.v3 = v3;
-		this.color = c;
+		//this.color = c;
+		this.r = c.getRed();
+		this.g = c.getGreen();
+		this.b = c.getBlue();
 	}
 
 	public Polygon(String line) {
@@ -19,21 +23,21 @@ public class Polygon {
 		// v1 v2 v3 v1 v2 v3 v1 v2 v3 r g  b
 		String[] split = line.split(" ");
 		try {
-			this.v1 = new Vertex(	Double.parseDouble(split[0]),
-									Double.parseDouble(split[1]),
-									Double.parseDouble(split[2]));
+			this.v1 = new Vertex(	Float.parseFloat(split[0]),
+									Float.parseFloat(split[1]),
+									Float.parseFloat(split[2]));
 
-			this.v2 = new Vertex(	Double.parseDouble(split[3]),
-									Double.parseDouble(split[4]),
-									Double.parseDouble(split[5]));
+			this.v2 = new Vertex(	Float.parseFloat(split[3]),
+									Float.parseFloat(split[4]),
+									Float.parseFloat(split[5]));
 
-			this.v3 = new Vertex(	Double.parseDouble(split[6]),
-									Double.parseDouble(split[7]),
-									Double.parseDouble(split[8]));
+			this.v3 = new Vertex(	Float.parseFloat(split[6]),
+									Float.parseFloat(split[7]),
+									Float.parseFloat(split[8]));
 
-			this.color = new Color(	Integer.parseInt(split[9]),
-									Integer.parseInt(split[10]),
-									Integer.parseInt(split[11]));
+			this.r = Integer.parseInt(split[9]);
+			this.g = Integer.parseInt(split[10]);
+			this.b = Integer.parseInt(split[11]);
 
 		} catch(NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid polygon information");
@@ -41,11 +45,7 @@ public class Polygon {
 	}
 
 	public Color getColor() {
-		return color;
-	}
-
-	public void setColor(Color color) {
-		this.color = color;
+		return new Color(r,g,b);
 	}
 
 	public Vertex getV1() {
@@ -58,5 +58,9 @@ public class Polygon {
 
 	public Vertex getV3() {
 		return v3;
+	}
+
+	public String toString() {
+		return String.format("[(%s), (%s), (%s), %s]",v1,v2,v3,getColor().toString());
 	}
 }
