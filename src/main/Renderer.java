@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 public class Renderer {
 	public List<Polygon> polygons;
 	public Vector3D lightSource;
-	static String filename = "res/tetras.txt";
+	static String filename = "res/ball.txt";
 	RenderFrame frame;
 	public Renderer() {
 		polygons = new ArrayList<Polygon>();
@@ -63,8 +63,12 @@ public class Renderer {
 		g.setColor(Color.black);
 		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 		g.setColor(Color.red);
+		Transform rotate = Transform.newYRotation(4);
+		Transform trans = Transform.newTranslation(100, 0, 0);
+		rotate = trans.compose(rotate);
 		for(Polygon p : polygons) {
-			Vector3D v1 = p.getV1(), v2 = p.getV2(), v3 = p.getV3();
+			
+			Vector3D v1 = rotate.multiply(p.getV1()), v2 = rotate.multiply(p.getV2()), v3 = rotate.multiply(p.getV3());
 			g.drawLine((int)v1.x, (int)v1.y, (int)v2.x, (int)v2.y);
 			g.drawLine((int)v2.x, (int)v2.y, (int)v3.x, (int)v3.y);
 			g.drawLine((int)v3.x, (int)v3.y, (int)v1.x, (int)v1.y);
