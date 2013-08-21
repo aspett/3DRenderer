@@ -1,4 +1,6 @@
 package main;
+
+import java.util.Collection;
 /* Code for COMP261 Assignment
  * Author: pondy
  */
@@ -107,6 +109,14 @@ public class Transform{
         y += values[1][0]*vect.x + values[1][1]*vect.y + values[1][2]*vect.z;
         z += values[2][0]*vect.x + values[2][1]*vect.y + values[2][2]*vect.z;
         return new Vector3D(x, y, z);
+    }
+    
+    public void applyTransform(Collection<Polygon> polygons) {
+    	for(Polygon p : polygons) {
+    		p.v1 = multiply(p.v1);
+    		p.v2 = multiply(p.v2);
+    		p.v3 = multiply(p.v3);
+    	}
     }
 
     public String toString(){

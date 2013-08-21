@@ -76,5 +76,13 @@ public class Polygon {
 		return String.format("[(%s), (%s), (%s), %s]",v1,v2,v3,getColor().toString());
 	}
 	
+	public boolean isHidden() {
+		Vector3D edge1 = new Vector3D(v2.x-v1.x, v2.y-v1.y, v2.z-v1.z);
+		Vector3D edge2 = new Vector3D(v3.x-v2.x, v3.y-v2.y, v3.z-v2.z);
+		Vector3D cross = edge1.crossProduct(edge2);
+		if(cross.z < 0) return true;
+		return false;
+	}
+	
 	
 }
