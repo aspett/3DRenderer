@@ -1,12 +1,13 @@
 package main;
 
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 
 
 
 @SuppressWarnings("serial")
 public class Polygon {
-	private Vector3D v1,v2,v3;
+	public Vector3D v1,v2,v3;
 	private int r,g,b;
 	//private Color color;
 
@@ -46,7 +47,15 @@ public class Polygon {
 			throw new IllegalArgumentException("Invalid polygon information");
 		}
 	}
-
+	
+	public Rectangle2D.Float getBounds() {
+		float left = Math.min(Math.min(v1.x, v2.x), v3.x);
+		float top = Math.min(Math.min(v1.y, v2.y), v3.y);
+		float right = Math.max(Math.max(v1.x,v2.x), v3.x);
+		float bottom = Math.max(Math.max(v1.y, v2.y), v3.y);
+		return new Rectangle2D.Float(left, top, right-left, bottom-top);
+	}
+	
 	public Color getColor() {
 		return new Color(r,g,b);
 	}
@@ -66,4 +75,6 @@ public class Polygon {
 	public String toString() {
 		return String.format("[(%s), (%s), (%s), %s]",v1,v2,v3,getColor().toString());
 	}
+	
+	
 }
