@@ -16,13 +16,18 @@ import edgelists.EdgeList;
 
 
 public class Renderer {
+
+	public static float lightIntensity = 0.7f;
+	public static float ambience = 0.6f;
+
+
 	public List<Polygon> polygons;
 	public Vector3D lightSource;
 	public Rectangle2D.Float bounds;
-	static String filename = "res/monkey.txt";
+	static String filename = "res/ball.txt";
 	boolean adjusted = false;
 	RenderFrame frame;
-	private float rotation = 0f;
+	private float rotation = 0.02f;
 	public Renderer() {
 		polygons = new ArrayList<Polygon>();
 		if(filename != null) loadPolygon(filename);
@@ -41,10 +46,10 @@ public class Renderer {
 		Renderer r = new Renderer();
 		PaintTimer t = new PaintTimer(r.frame);
 
-		System.out.println("Light source: " + r.lightSource.toString());
+		//System.out.println("Light source: " + r.lightSource.toString());
 		for(Polygon p : r.polygons) {
 
-			System.out.println(p);
+			//System.out.println(p);
 		}
 		r.adjustPolygonForWindow();
 		t.start();
@@ -66,7 +71,8 @@ public class Renderer {
 			scan.close();
 		}
 		catch(FileNotFoundException e) {
-
+			System.out.printf("File, %s, does not exist!", filename);
+			System.exit(0);
 		}
 	}
 
@@ -80,7 +86,7 @@ public class Renderer {
 
 
 
-		//System.out.printf("Canvas height: %d, bound height: %f offset: %f\n", frame.canvas.getHeight(), height, centerYoffset);
+		////System.out.printf("Canvas height: %d, bound height: %f offset: %f\n", frame.canvas.getHeight(), height, centerYoffset);
 
 		Color[][] zBufferC = new Color[800][600];
 		for(int i = 0; i < zBufferC.length; i++) {
@@ -99,7 +105,7 @@ public class Renderer {
 			if(!p.isHidden()) continue;
 			EdgeList el = p.computeEdgeList();
 			Color shading = p.getShadedColor(lightSource);
-			for(int y = 0; y < el.rows.length; y++) {
+			for(int y = 0; y < el.rows.length-1; y++) {
 				int x = Math.round(el.rows[y].lx);
 
 				if(y < 0 || y >= 600) continue;
@@ -163,9 +169,9 @@ public class Renderer {
 
 
 
-		}*/
+		}
 		getBounds();
-		g.drawRect((int)bounds.x, (int)bounds.y, (int)bounds.width, (int)bounds.height);
+		g.drawRect((int)bounds.x, (int)bounds.y, (int)bounds.width, (int)bounds.height);*/
 	}
 
 	protected Rectangle2D.Float getBounds() {
@@ -187,7 +193,7 @@ public class Renderer {
 
 	protected void adjustPolygonForWindow() {
 		getBounds();
-		this.rotation = this.rotation  + 0.005f;
+		//this.rotation = this.rotation  + 0.005f;
 		Transform rotate = Transform.newYRotation(this.rotation);
 		rotate.applyTransform(polygons);
 		lightSource = rotate.multiply(lightSource);
@@ -205,9 +211,9 @@ public class Renderer {
 		float centerYoffset = (frame.canvas.getHeight() - height)/2;
 		Transform trans = Transform.newTranslation(0-bounds.x + centerXoffset, 0-bounds.y, 0);
 		//Transform trans = Transform.newTranslation(0, 0, 0);
-		System.out.printf("%d - %f = %f\n", frame.canvas.getWidth(), width, (float)frame.canvas.getWidth()-width);
-		System.out.println(bounds + " Window: ["+frame.canvas.getWidth()+","+frame.canvas.getHeight()+"]");
-		System.out.printf("0-bounds: %f | %f\ncenterXoff: %f, centerYoff: %f\n", 0-bounds.x, 0-bounds.y, centerXoffset, centerYoffset);
+		//System.out.printf("%d - %f = %f\n", frame.canvas.getWidth(), width, (float)frame.canvas.getWidth()-width);
+		//System.out.println(bounds + " Window: ["+frame.canvas.getWidth()+","+frame.canvas.getHeight()+"]");
+		//System.out.printf("0-bounds: %f | %f\ncenterXoff: %f, centerYoff: %f\n", 0-bounds.x, 0-bounds.y, centerXoffset, centerYoffset);
 		float left = 0;
 		boolean reset = true;
 		for(Polygon p : polygons) {
@@ -215,10 +221,10 @@ public class Renderer {
 			if(p.v2.x < left || reset) { left = p.v2.x; reset = false; }
 			if(p.v3.x < left || reset) { left = p.v3.x; reset = false; }
 		}
-		System.out.println(left);
+		//System.out.println(left);
 		trans.applyTransform(polygons);
 		getBounds();
-		System.out.println(bounds);
+		//System.out.println(bounds);
 		adjusted = true;
 
 	}

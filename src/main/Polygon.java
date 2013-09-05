@@ -102,7 +102,7 @@ public class Polygon {
 		int red = Math.max(Math.min(applyShading(this.r, costh), 255), 0);
 		int green = Math.max(Math.min(applyShading(this.g,costh), 255), 0);
 		int blue = Math.max(Math.min(applyShading(this.b,costh), 255), 0);
-		System.out.printf("%d %d %d\n", red, green, blue);
+		//System.out.printf("%d %d %d\n", red, green, blue);
 		this.shadedColor = new Color(red,green,blue);
 	}
 
@@ -112,11 +112,7 @@ public class Polygon {
 	}
 
 	private int applyShading(int colorComponent, float costh) {
-		return (int) ((getAmbientLight() + 1 * costh) * colorComponent);
-	}
-
-	private float getAmbientLight() {
-		return 0.5f;
+		return (int) ((Renderer.ambience + Renderer.lightIntensity * costh) * colorComponent);
 	}
 
 	public List<Edge> getEdges() {
@@ -140,7 +136,7 @@ public class Polygon {
 	public EdgeList computeEdgeList() {
 		//int miny = minY();
 		int maxy = maxY();
-		EdgeList el = new EdgeList(maxy+2);
+		EdgeList el = new EdgeList(maxy);
 		for(Edge edge : getEdges()) {
 			Vector3D va = edge.v1.compareTo(edge.v2) <= 0 ? edge.v1 : edge.v2;
 			Vector3D vb = edge.otherV(va);
@@ -155,8 +151,7 @@ public class Polygon {
 				x = x+mx;
 				z = z+mz;
 			}
-			System.out.printf("el length: %d, maxi: %d maxy: %d\n", el.rows.length, maxi, maxy);
-			el.rows[maxi].insertValues(vb.x, vb.y);
+			//el.rows[maxi].insertValues(vb.x, vb.y);
 
 
 		}

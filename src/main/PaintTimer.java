@@ -5,11 +5,11 @@ public class PaintTimer extends Thread{
 	public PaintTimer(RenderFrame f) {
 		frame = f;
 	}
-	
+
 	public void run() {
 		while(true) {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(10);
 			frame.repaint();
 		} catch(InterruptedException e) { }
 		}
