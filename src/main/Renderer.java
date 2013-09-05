@@ -17,8 +17,8 @@ import edgelists.EdgeList;
 
 public class Renderer {
 
-	public static float lightIntensity = 0.7f;
-	public static float ambience = 0.6f;
+	public static float lightIntensity = 1f;
+	public static float ambience = 0.5f;
 
 
 	public List<Polygon> polygons;
@@ -77,7 +77,7 @@ public class Renderer {
 	}
 
 	protected void renderCanvas(Graphics gr, JPanel panel) {
-		if(!adjusted) return;
+		//if(!adjusted) return;
 		adjustPolygonForWindow();
 		Graphics2D g = (Graphics2D) gr;
 		g.setColor(Color.black);
@@ -154,8 +154,8 @@ public class Renderer {
 
 
 
-
-		/*for(Polygon p : polygons) {
+/*
+		for(Polygon p : polygons) {
 			//p.computeEdgeList();
 			if(!p.isHidden()) {
 				g.setColor(p.getShadedColor(lightSource));
@@ -169,7 +169,7 @@ public class Renderer {
 
 
 
-		}
+		}/*
 		getBounds();
 		g.drawRect((int)bounds.x, (int)bounds.y, (int)bounds.width, (int)bounds.height);*/
 	}
