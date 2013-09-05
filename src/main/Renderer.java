@@ -3,7 +3,6 @@ package main;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +12,8 @@ import java.util.Scanner;
 
 import javax.swing.JPanel;
 
+import edgelists.EdgeList;
+
 
 public class Renderer {
 	public List<Polygon> polygons;
@@ -21,10 +22,11 @@ public class Renderer {
 	static String filename = "res/monkey.txt";
 	boolean adjusted = false;
 	RenderFrame frame;
+	private float rotation = 0f;
 	public Renderer() {
 		polygons = new ArrayList<Polygon>();
 		if(filename != null) loadPolygon(filename);
-		
+
 		frame = new RenderFrame();
 		frame.canvas.setPainter(new Painter() {
 			@Override
@@ -32,70 +34,140 @@ public class Renderer {
 				renderCanvas(g, p);
 			}
 		});
-		
+
 	}
 
 	public static void main(String[] args) {
 		Renderer r = new Renderer();
 		PaintTimer t = new PaintTimer(r.frame);
-		
+
 		System.out.println("Light source: " + r.lightSource.toString());
 		for(Polygon p : r.polygons) {
-			
+
 			System.out.println(p);
 		}
 		r.adjustPolygonForWindow();
 		t.start();
-		
+		//t.run();
+
 	}
 
 	public void loadPolygon(String filename) {
 		try {
 			Scanner scan = new Scanner(new File(filename));
 			if(!scan.hasNextLine()) { scan.close(); return; }
-			
+
 			lightSource = new Vector3D(scan.nextLine());
 
 			while(scan.hasNextLine()) {
 				polygons.add(new Polygon(scan.nextLine()));
 			}
-			
+
 			scan.close();
-		} 
+		}
 		catch(FileNotFoundException e) {
 
 		}
 	}
-	
+
 	protected void renderCanvas(Graphics gr, JPanel panel) {
 		if(!adjusted) return;
+		adjustPolygonForWindow();
 		Graphics2D g = (Graphics2D) gr;
 		g.setColor(Color.black);
 		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 		g.setColor(Color.red);
-		
-		
-		
+
+
+
 		//System.out.printf("Canvas height: %d, bound height: %f offset: %f\n", frame.canvas.getHeight(), height, centerYoffset);
 
+		Color[][] zBufferC = new Color[800][600];
+		for(int i = 0; i < zBufferC.length; i++) {
+			for(int j = 0; j < zBufferC[0].length; j++) {
+				zBufferC[i][j] = new Color(0,0,0);
+			}
+		}
+		Float[][] zBufferD = new Float[800][600];
+		for(int i = 0; i < zBufferD.length; i++) {
+			for(int j = 0; j < zBufferD[0].length; j++) {
+				zBufferD[i][j] = Float.POSITIVE_INFINITY;
+			}
+		}
+
 		for(Polygon p : polygons) {
+			if(!p.isHidden()) continue;
+			EdgeList el = p.computeEdgeList();
+			Color shading = p.getShadedColor(lightSource);
+			for(int y = 0; y < el.rows.length; y++) {
+				int x = Math.round(el.rows[y].lx);
+
+				if(y < 0 || y >= 600) continue;
+				float z = el.rows[y].lz;
+				float mz = (el.rows[y].rz - el.rows[y].lz) / (el.rows[y].rx - el.rows[y].lx);
+				while(x <= Math.round(el.rows[y].rx)) {
+					if(x < 0 || x >= 800) break;
+					if(z < zBufferD[x][y]) {
+						zBufferD[x][y] = z;
+						zBufferC[x][y] = shading;
+					}
+					x++;
+					z = z+mz;
+				}
+			}
+		}
+
+		for(int i = 0; i < zBufferC.length; i++) {
+			for(int j = 0; j < zBufferC[0].length; j++) {
+				g.setColor(zBufferC[i][j]);
+				g.drawRect(i, j, 1, 1);
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/*for(Polygon p : polygons) {
+			//p.computeEdgeList();
 			if(!p.isHidden()) {
-				g.setColor(Color.green);
-			}else 
-				g.setColor(Color.red);
+				g.setColor(p.getShadedColor(lightSource));
+			}else
+				g.setColor(new Color(200,50,0,25));
 
 			g.drawLine((int)p.v1.x, (int)p.v1.y, (int)p.v2.x, (int)p.v2.y);
 			g.drawLine((int)p.v2.x, (int)p.v2.y, (int)p.v3.x, (int)p.v3.y);
 			g.drawLine((int)p.v3.x, (int)p.v3.y, (int)p.v1.x, (int)p.v1.y);
-			
-			
-			
-			
-		}
+
+
+
+
+		}*/
 		getBounds();
 		g.drawRect((int)bounds.x, (int)bounds.y, (int)bounds.width, (int)bounds.height);
 	}
-	
+
 	protected Rectangle2D.Float getBounds() {
 		Float left=Float.POSITIVE_INFINITY, top=Float.POSITIVE_INFINITY, right=Float.NEGATIVE_INFINITY, bottom=Float.NEGATIVE_INFINITY;
 
@@ -108,17 +180,19 @@ public class Renderer {
 			if(polyRight > right) right = polyRight;
 			if(polyBottom > bottom) bottom = polyBottom;
 		}
-		
+
 		this.bounds = new Rectangle2D.Float(left, top, right-left, bottom-top);
 		return this.bounds;
 	}
-	
+
 	protected void adjustPolygonForWindow() {
 		getBounds();
-		Transform rotate = Transform.newXRotation(1f);
+		this.rotation = this.rotation  + 0.005f;
+		Transform rotate = Transform.newYRotation(this.rotation);
 		rotate.applyTransform(polygons);
+		lightSource = rotate.multiply(lightSource);
 		getBounds();
-		
+
 		float windowXratio = frame.canvas.getWidth()/ bounds.width ;
 		float windowYRatio = frame.canvas.getHeight() / bounds.height;
 		float scaleRatio = Math.min(windowXratio, windowYRatio);
@@ -146,6 +220,6 @@ public class Renderer {
 		getBounds();
 		System.out.println(bounds);
 		adjusted = true;
-		
+
 	}
 }

@@ -1,4 +1,6 @@
 package main;
+
+import java.util.Comparator;
 /* Code for COMP261 Assignment
  * Author: pondy
  */
@@ -8,7 +10,7 @@ package main;
  *  Note that it is safe to make the fields public because they
  *  are final and cannot be modified
  */
-public class Vector3D{
+public class Vector3D implements Comparable<Vector3D>{
     public final float x;
     public final float y;
     public final float z;
@@ -87,4 +89,20 @@ public class Vector3D{
         ans.append('(').append(x).append(',').append(y).append(',').append(z).append(')');
         return ans.toString();
     }
+
+    protected Comparator<Vector3D> yComparator() {
+    	return new Comparator<Vector3D>(){
+			@Override
+			public int compare(Vector3D o1, Vector3D o2) {
+				if(o1.y < o2.y) return -1;
+				if(o1.y > o2.y) return 1;
+				return 0;
+			}
+    	};
+    }
+
+	@Override
+	public int compareTo(Vector3D o) {
+		return yComparator().compare(this, o);
+	}
 }
