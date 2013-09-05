@@ -19,7 +19,7 @@ public class Renderer {
 
 	public static float lightIntensity = 1f;
 	public static float ambience = 0.5f;
-	static String filename = "res/ball.txt";
+	static String filename = "res/monkey.txt";
 
 	public List<Polygon> polygons;
 	public Vector3D lightSource;
@@ -27,8 +27,9 @@ public class Renderer {
 
 	boolean adjusted = false;
 	RenderFrame frame;
-	private float rotation = 0.02f;
+	private float rotation = 0.00f;
 	public static float scale = 1f;
+	private static int yTranslation = 0;
 
 
 
@@ -56,7 +57,7 @@ public class Renderer {
 			//System.out.println(p);
 		}
 		r.adjustPolygonForWindow();
-		t.start();
+		//t.start();
 		//t.run();
 
 	}
@@ -81,6 +82,9 @@ public class Renderer {
 	}
 
 	protected void renderCanvas(Graphics gr, JPanel panel) {
+		int windowWidth = frame.canvas.getWidth();
+		int windowHeight = frame.canvas.getHeight();
+
 		//if(!adjusted) return;
 		adjustPolygonForWindow();
 		Graphics2D g = (Graphics2D) gr;
@@ -92,18 +96,20 @@ public class Renderer {
 
 		////System.out.printf("Canvas height: %d, bound height: %f offset: %f\n", frame.canvas.getHeight(), height, centerYoffset);
 
-		Color[][] zBufferC = new Color[800][600];
+		Color[][] zBufferC = new Color[windowWidth][windowHeight];
 		for(int i = 0; i < zBufferC.length; i++) {
 			for(int j = 0; j < zBufferC[0].length; j++) {
 				zBufferC[i][j] = new Color(0,0,0);
 			}
 		}
-		Float[][] zBufferD = new Float[800][600];
+		Float[][] zBufferD = new Float[windowWidth][windowHeight];
 		for(int i = 0; i < zBufferD.length; i++) {
 			for(int j = 0; j < zBufferD[0].length; j++) {
 				zBufferD[i][j] = Float.POSITIVE_INFINITY;
 			}
 		}
+
+		//g.translate(0,Renderer.yTranslation);
 
 		for(Polygon p : polygons) {
 			if(!p.isHidden()) continue;
@@ -113,13 +119,13 @@ public class Renderer {
 				//System.out.println(y);
 				int x = Math.round(el.rows[y].lx);
 
-				if(y < 0 || y >= 600) continue;
+				if(y < 0 || y >= windowHeight) continue;
 				float z = el.rows[y].lz;
 				float mz = (el.rows[y].rz - el.rows[y].lz) / (el.rows[y].rx - el.rows[y].lx);
 				//System.out.println(el.rows[y].rx);
 				//if(el.rows[y].rx == Float.NEGATIVE_INFINITY) System.out.println("NEGINF");
 				while(x <= Math.round(el.rows[y].rx) && el.rows[y].rx >= 0) {
-					if(x < 0 || x >= 800) {x++; continue;}
+					if(x < 0 || x >= windowWidth) {x++; continue;}
 					if(z < zBufferD[x][y]) {
 						zBufferD[x][y] = z;
 						zBufferC[x][y] = shading;
@@ -201,10 +207,12 @@ public class Renderer {
 	protected void adjustPolygonForWindow() {
 		getBounds();
 		//this.rotation = this.rotation  + 0.005f;
-		Transform rotate = Transform.newYRotation(this.rotation);
-		rotate.applyTransform(polygons);
-		lightSource = rotate.multiply(lightSource);
-		getBounds();
+		if(this.rotation != 0f) {
+			Transform rotate = Transform.newYRotation(this.rotation);
+			rotate.applyTransform(polygons);
+			lightSource = rotate.multiply(lightSource);
+			getBounds();
+		}
 
 		float windowXratio = frame.canvas.getWidth()/ bounds.width ;
 		float windowYRatio = frame.canvas.getHeight() / bounds.height;
@@ -217,20 +225,23 @@ public class Renderer {
 		float height = bounds.height;
 		float centerXoffset = (frame.canvas.getWidth() - width)/2;
 		float centerYoffset = (frame.canvas.getHeight() - height)/2;
-		Transform trans = Transform.newTranslation(0-bounds.x + centerXoffset, 0-bounds.y, 0);
+		Transform trans = Transform.newTranslation(0-bounds.x + centerXoffset, 0-bounds.y + centerYoffset, 0);
+		Renderer.yTranslation = (int)centerYoffset;
+		trans.applyTransform(polygons);
+
 		//Transform trans = Transform.newTranslation(0, 0, 0);
 		//System.out.printf("%d - %f = %f\n", frame.canvas.getWidth(), width, (float)frame.canvas.getWidth()-width);
 		//System.out.println(bounds + " Window: ["+frame.canvas.getWidth()+","+frame.canvas.getHeight()+"]");
 		//System.out.printf("0-bounds: %f | %f\ncenterXoff: %f, centerYoff: %f\n", 0-bounds.x, 0-bounds.y, centerXoffset, centerYoffset);
-		float left = 0;
+		/*float left = 0;
 		boolean reset = true;
 		for(Polygon p : polygons) {
 			if(p.v1.x < left || reset) { left = p.v1.x; reset = false; }
 			if(p.v2.x < left || reset) { left = p.v2.x; reset = false; }
 			if(p.v3.x < left || reset) { left = p.v3.x; reset = false; }
 		}
-		//System.out.println(left);
-		trans.applyTransform(polygons);
+		//System.out.println(left);*/
+
 		getBounds();
 		//System.out.println(bounds);
 		if(!adjusted) Renderer.scale = 1f;

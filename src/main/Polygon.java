@@ -16,6 +16,7 @@ public class Polygon {
 	private int r,g,b;
 	private Color shadedColor;
 	private List<Edge> edgeCache;
+	private boolean affineHidden;
 
 	public Polygon(Vector3D v1, Vector3D v2, Vector3D v3, Color c) {
 		this.v1 = v1;
@@ -34,16 +35,16 @@ public class Polygon {
 		String[] split = line.split(" ");
 		try {
 			this.v1 = new Vector3D(	Float.parseFloat(split[0]),
-									Float.parseFloat(split[1]),
-									Float.parseFloat(split[2]));
+					Float.parseFloat(split[1]),
+					Float.parseFloat(split[2]));
 
 			this.v2 = new Vector3D(	Float.parseFloat(split[3]),
-									Float.parseFloat(split[4]),
-									Float.parseFloat(split[5]));
+					Float.parseFloat(split[4]),
+					Float.parseFloat(split[5]));
 
 			this.v3 = new Vector3D(	Float.parseFloat(split[6]),
-									Float.parseFloat(split[7]),
-									Float.parseFloat(split[8]));
+					Float.parseFloat(split[7]),
+					Float.parseFloat(split[8]));
 
 			this.r = Integer.parseInt(split[9]);
 			this.g = Integer.parseInt(split[10]);
@@ -136,26 +137,32 @@ public class Polygon {
 	public EdgeList computeEdgeList() {
 		//int miny = minY();
 		int maxy = maxY();
-		EdgeList el = new EdgeList(maxy);
-		for(Edge edge : getEdges()) {
-			Vector3D va = edge.v1.compareTo(edge.v2) <= 0 ? edge.v1 : edge.v2;
-			Vector3D vb = edge.otherV(va);
-			float mx = (vb.x-va.x)/(vb.y-va.y);
-			float mz = (vb.z-va.z)/(vb.y-va.y);
-			float x = va.x, z = va.z;
-			int i = Math.round(va.y), maxi = Math.round(vb.y);
-			while (i < maxi) {
-				EdgeListRow row = el.rows[i];
-				row.insertValues(x, z);
-				i++;
-				x = x+mx;
-				z = z+mz;
+		if(maxy < 0) {
+			affineHidden = true;
+			return new EdgeList(0);
+		} else {
+			EdgeList el = new EdgeList(maxy);
+			for(Edge edge : getEdges()) {
+				Vector3D va = edge.v1.compareTo(edge.v2) <= 0 ? edge.v1 : edge.v2;
+				Vector3D vb = edge.otherV(va);
+				float mx = (vb.x-va.x)/(vb.y-va.y);
+				float mz = (vb.z-va.z)/(vb.y-va.y);
+				float x = va.x, z = va.z;
+				int i = Math.round(va.y), maxi = Math.round(vb.y);
+				while (i < maxi) {
+					if(i < 0) {x = x+mx; z = z+mz; i++; continue; }
+					EdgeListRow row = el.rows[i];
+					row.insertValues(x, z);
+					i++;
+					x = x+mx;
+					z = z+mz;
+				}
+				//el.rows[maxi].insertValues(vb.x, vb.y);
+
+
 			}
-			//el.rows[maxi].insertValues(vb.x, vb.y);
-
-
+			return el;
 		}
-		return el;
 	}
 
 

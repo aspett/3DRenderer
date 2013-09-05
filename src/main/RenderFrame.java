@@ -18,7 +18,7 @@ public class RenderFrame extends JFrame {
 	public RenderFrame() {
 		super();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setResizable(false);
+		//setResizable(false);
 		setLayout(new BorderLayout());
 
 		JPanel commandPanel = new JPanel();
@@ -41,6 +41,7 @@ public class RenderFrame extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				JSlider source = (JSlider) e.getSource();
 				Renderer.ambience = ((float) source.getValue()) / 10;
+				canvas.repaint();
 
 			}
 		};
@@ -51,7 +52,7 @@ public class RenderFrame extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				JSlider source = (JSlider) e.getSource();
 				Renderer.scale = ((float) source.getValue()) / 100;
-
+				canvas.repaint();
 			}
 		};
 	}
