@@ -19,15 +19,19 @@ public class Renderer {
 
 	public static float lightIntensity = 1f;
 	public static float ambience = 0.5f;
-
+	static String filename = "res/ball.txt";
 
 	public List<Polygon> polygons;
 	public Vector3D lightSource;
 	public Rectangle2D.Float bounds;
-	static String filename = "res/ball.txt";
+
 	boolean adjusted = false;
 	RenderFrame frame;
 	private float rotation = 0.02f;
+	public static float scale = 1f;
+
+
+
 	public Renderer() {
 		polygons = new ArrayList<Polygon>();
 		if(filename != null) loadPolygon(filename);
@@ -106,13 +110,16 @@ public class Renderer {
 			EdgeList el = p.computeEdgeList();
 			Color shading = p.getShadedColor(lightSource);
 			for(int y = 0; y < el.rows.length-1; y++) {
+				//System.out.println(y);
 				int x = Math.round(el.rows[y].lx);
 
 				if(y < 0 || y >= 600) continue;
 				float z = el.rows[y].lz;
 				float mz = (el.rows[y].rz - el.rows[y].lz) / (el.rows[y].rx - el.rows[y].lx);
-				while(x <= Math.round(el.rows[y].rx)) {
-					if(x < 0 || x >= 800) break;
+				//System.out.println(el.rows[y].rx);
+				//if(el.rows[y].rx == Float.NEGATIVE_INFINITY) System.out.println("NEGINF");
+				while(x <= Math.round(el.rows[y].rx) && el.rows[y].rx >= 0) {
+					if(x < 0 || x >= 800) {x++; continue;}
 					if(z < zBufferD[x][y]) {
 						zBufferD[x][y] = z;
 						zBufferC[x][y] = shading;
@@ -202,6 +209,7 @@ public class Renderer {
 		float windowXratio = frame.canvas.getWidth()/ bounds.width ;
 		float windowYRatio = frame.canvas.getHeight() / bounds.height;
 		float scaleRatio = Math.min(windowXratio, windowYRatio);
+		scaleRatio = scaleRatio * Math.max(Renderer.scale, 0.05f);
 		Transform scale = Transform.newScale(scaleRatio, scaleRatio, scaleRatio);
 		scale.applyTransform(polygons);
 		getBounds();
@@ -225,6 +233,7 @@ public class Renderer {
 		trans.applyTransform(polygons);
 		getBounds();
 		//System.out.println(bounds);
+		if(!adjusted) Renderer.scale = 1f;
 		adjusted = true;
 
 	}
