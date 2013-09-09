@@ -3,7 +3,10 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -27,12 +30,29 @@ public class RenderFrame extends JFrame {
 
 		add(commandPanel, BorderLayout.NORTH);
 		addSliders(commandPanel);
+		addButtons(commandPanel);
 
 		canvas = new RenderCanvas();
 		add(canvas, BorderLayout.CENTER);
 		pack();
 
 		setVisible(true);
+	}
+
+	private void addButtons(JPanel commandPanel) {
+		JButton resetPos = new JButton("Reset position");
+		resetPos.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Renderer.adjusted = false;
+				repaint();
+
+			}
+
+		});
+		commandPanel.add(resetPos);
+
 	}
 
 	private ChangeListener ambientLightListener() {

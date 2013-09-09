@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -25,11 +26,14 @@ public class Renderer {
 	public Vector3D lightSource;
 	public Rectangle2D.Float bounds;
 
-	boolean adjusted = false;
+	public static boolean adjusted = false;
 	RenderFrame frame;
-	private float rotation = 0.00f;
+	private float yRotation = 0.02f;
+	private float xRotation = 0.00f;
+
 	public static float scale = 1f;
-	private static int yTranslation = 0;
+	public static int yDrag = 0;
+	public static int xDrag = 0;
 
 
 
@@ -52,13 +56,9 @@ public class Renderer {
 		PaintTimer t = new PaintTimer(r.frame);
 
 		//System.out.println("Light source: " + r.lightSource.toString());
-		for(Polygon p : r.polygons) {
-
-			//System.out.println(p);
-		}
 		r.adjustPolygonForWindow();
-		//t.start();
-		//t.run();
+		t.start();
+		t.run();
 
 	}
 
@@ -85,8 +85,15 @@ public class Renderer {
 		int windowWidth = frame.canvas.getWidth();
 		int windowHeight = frame.canvas.getHeight();
 
+		/*if(xDrag != 0) { yRotation = ((float)xDrag) / -500; xDrag = 0; }
+		if(yDrag != 0) { xRotation = ((float)yDrag) / -500; xDrag = 0; }*/
+
 		//if(!adjusted) return;
 		adjustPolygonForWindow();
+
+		/*xRotation = 0f;
+		yRotation = 0f;*/
+
 		Graphics2D g = (Graphics2D) gr;
 		g.setColor(Color.black);
 		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
@@ -136,12 +143,16 @@ public class Renderer {
 			}
 		}
 
+
+		BufferedImage image = new BufferedImage(zBufferC.length, zBufferC[0].length, BufferedImage.TYPE_INT_RGB);
 		for(int i = 0; i < zBufferC.length; i++) {
 			for(int j = 0; j < zBufferC[0].length; j++) {
-				g.setColor(zBufferC[i][j]);
-				g.drawRect(i, j, 1, 1);
+				image.setRGB(i, j, zBufferC[i][j].getRGB());
+				/*g.setColor(zBufferC[i][j]);
+				g.drawRect(i, j, 1, 1);*/
 			}
 		}
+		g.drawImage(image,0,0, frame);
 
 
 
@@ -207,12 +218,14 @@ public class Renderer {
 	protected void adjustPolygonForWindow() {
 		getBounds();
 		//this.rotation = this.rotation  + 0.005f;
-		if(this.rotation != 0f) {
-			Transform rotate = Transform.newYRotation(this.rotation);
+		//if(this.yRotation != 0f || this.xRotation  != 0f) {
+			Transform yRotate = Transform.newYRotation(this.yRotation);
+			Transform xRotate = Transform.newXRotation(this.xRotation);
+			Transform rotate = yRotate.compose(xRotate);
 			rotate.applyTransform(polygons);
 			lightSource = rotate.multiply(lightSource);
-			getBounds();
-		}
+			//getBounds();
+		//}
 
 		float windowXratio = frame.canvas.getWidth()/ bounds.width ;
 		float windowYRatio = frame.canvas.getHeight() / bounds.height;
@@ -226,7 +239,6 @@ public class Renderer {
 		float centerXoffset = (frame.canvas.getWidth() - width)/2;
 		float centerYoffset = (frame.canvas.getHeight() - height)/2;
 		Transform trans = Transform.newTranslation(0-bounds.x + centerXoffset, 0-bounds.y + centerYoffset, 0);
-		Renderer.yTranslation = (int)centerYoffset;
 		trans.applyTransform(polygons);
 
 		//Transform trans = Transform.newTranslation(0, 0, 0);
@@ -242,7 +254,7 @@ public class Renderer {
 		}
 		//System.out.println(left);*/
 
-		getBounds();
+		//getBounds();
 		//System.out.println(bounds);
 		if(!adjusted) Renderer.scale = 1f;
 		adjusted = true;
