@@ -27,9 +27,12 @@ public class Renderer {
 
 	boolean adjusted = false;
 	RenderFrame frame;
-	private float rotation = 0.00f;
+	private float rotation = 0.02f;
 	public static float scale = 1f;
 	private static int yTranslation = 0;
+
+	PaintTimer timer;
+	boolean rendering = false;
 
 
 
@@ -37,7 +40,7 @@ public class Renderer {
 		polygons = new ArrayList<Polygon>();
 		if(filename != null) loadPolygon(filename);
 
-		frame = new RenderFrame();
+		frame = new RenderFrame(this);
 		frame.canvas.setPainter(new Painter() {
 			@Override
 			public void paint(Graphics g, JPanel p) {
@@ -50,14 +53,11 @@ public class Renderer {
 	public static void main(String[] args) {
 		Renderer r = new Renderer();
 		PaintTimer t = new PaintTimer(r.frame);
-
+		r.timer = t;
 		//System.out.println("Light source: " + r.lightSource.toString());
-		for(Polygon p : r.polygons) {
 
-			//System.out.println(p);
-		}
 		r.adjustPolygonForWindow();
-		//t.start();
+		r.timer.start();
 		//t.run();
 
 	}
@@ -68,7 +68,7 @@ public class Renderer {
 			if(!scan.hasNextLine()) { scan.close(); return; }
 
 			lightSource = new Vector3D(scan.nextLine());
-
+			polygons = new ArrayList<Polygon>();
 			while(scan.hasNextLine()) {
 				polygons.add(new Polygon(scan.nextLine()));
 			}
@@ -84,9 +84,9 @@ public class Renderer {
 	protected void renderCanvas(Graphics gr, JPanel panel) {
 		int windowWidth = frame.canvas.getWidth();
 		int windowHeight = frame.canvas.getHeight();
-
 		//if(!adjusted) return;
 		adjustPolygonForWindow();
+
 		Graphics2D g = (Graphics2D) gr;
 		g.setColor(Color.black);
 		g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
@@ -143,34 +143,9 @@ public class Renderer {
 			}
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-		for(Polygon p : polygons) {
+		/*for(Polygon p : polygons) {
 			//p.computeEdgeList();
-			if(!p.isHidden()) {
+			if(p.isHidden()) {
 				g.setColor(p.getShadedColor(lightSource));
 			}else
 				g.setColor(new Color(200,50,0,25));

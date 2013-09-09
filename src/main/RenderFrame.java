@@ -3,8 +3,15 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -14,9 +21,11 @@ import javax.swing.event.ChangeListener;
 public class RenderFrame extends JFrame {
 
 	RenderCanvas canvas;
-
-	public RenderFrame() {
+	Renderer renderer;
+	public RenderFrame(Renderer renderer) {
 		super();
+
+		this.renderer = renderer;
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		//setResizable(false);
 		setLayout(new BorderLayout());
@@ -27,6 +36,28 @@ public class RenderFrame extends JFrame {
 
 		add(commandPanel, BorderLayout.NORTH);
 		addSliders(commandPanel);
+
+		JMenuBar menuBar = new JMenuBar();
+		JMenu fileMenu = new JMenu("File");
+		JMenuItem openMenu = new JMenuItem("Open");
+		fileMenu.add(openMenu);
+		menuBar.add(fileMenu);
+
+		this.setJMenuBar(menuBar);
+		final RenderFrame thisFrame = this;
+		openMenu.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fc = new JFileChooser();
+				File newFile = null;
+				int returnVal = fc.showOpenDialog(thisFrame);
+				if (returnVal == JFileChooser.APPROVE_OPTION){
+					newFile = fc.getSelectedFile();
+					thisFrame.renderer.loadPolygon(newFile.getAbsolutePath());
+				}
+			}
+		});
 
 		canvas = new RenderCanvas();
 		add(canvas, BorderLayout.CENTER);
