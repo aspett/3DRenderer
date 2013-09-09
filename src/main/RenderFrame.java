@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -36,6 +37,7 @@ public class RenderFrame extends JFrame {
 
 		add(commandPanel, BorderLayout.NORTH);
 		addSliders(commandPanel);
+		addButtons(commandPanel);
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
@@ -64,6 +66,22 @@ public class RenderFrame extends JFrame {
 		pack();
 
 		setVisible(true);
+	}
+
+	private void addButtons(JPanel commandPanel) {
+		JButton resetPos = new JButton("Reset position");
+		resetPos.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Renderer.adjusted = false;
+				repaint();
+
+			}
+
+		});
+		commandPanel.add(resetPos);
+
 	}
 
 	private ChangeListener ambientLightListener() {
