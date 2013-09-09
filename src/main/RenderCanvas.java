@@ -48,6 +48,7 @@ public class RenderCanvas extends JPanel implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		Renderer.isRotating = false;
 		this.originalX = e.getX();
 		this.originalY = e.getY();
 

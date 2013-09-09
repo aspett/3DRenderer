@@ -69,13 +69,12 @@ public class RenderFrame extends JFrame {
 	}
 
 	private void addButtons(JPanel commandPanel) {
-		JButton resetPos = new JButton("Reset position");
+		JButton resetPos = new JButton("Resume rotation");
 		resetPos.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Renderer.adjusted = false;
-				repaint();
+				Renderer.isRotating = true;
 
 			}
 

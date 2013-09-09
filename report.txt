@@ -1,0 +1,9 @@
+- What it does
+
+Renders correctly.
+Rotates via mouse, or automatic rotation
+Changes ambient light and scale (off the screen if necessary)
+
+- Testing
+
+Program was tested by comparing the rendered images to the images given with the assignment.
